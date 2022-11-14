@@ -1,8 +1,9 @@
 const fs = require('fs');
 const path = require('path');
+const https = require('https');
 
 const tempDir = require('temp-dir');
-const request = require('request');
+const axios = require('axios');
 const iconv = require('iconv-lite');
 const parseXml = require('xml2js').parseString;
 
@@ -24,8 +25,8 @@ class Rega {
         this.disableTranslation = options.disableTranslation;
         this.host = options.host;
         this.tls = options.tls;
+        this.tlsOptions = { rejectUnauthorized: !(options.inSecure || false) };
         this.port = options.port || (this.tls ? 48181 : 8181);
-        this.inSecure = options.inSecure;
         this.auth = options.auth;
         this.user = options.user;
         this.pass = options.pass;
@@ -34,18 +35,17 @@ class Rega {
         this.requestOptions = {
             method: 'POST',
             url: this.url,
-            encoding: null
+            responseType: 'arraybuffer'
         };
         if (this.auth) {
             this.requestOptions.auth = {
-                user: this.user,
-                pass: this.pass,
-                sendImmediately: true
+                username: this.user,
+                password: this.pass
             };
         }
 
         if (this.tls) {
-            this.requestOptions.strictSSL = !this.inSecure;
+            this.requestOptions.httpsAgent = new https.Agent(this.tlsOptions);
         }
     }
 
@@ -96,24 +96,27 @@ class Rega {
         }
 
         script = iconv.encode(script, this.encoding);
-        request(Object.assign(this.requestOptions, {
-            body: script,
+        axios(Object.assign(this.requestOptions, {
+            data: script,
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
                 'Content-Length': script.length
             }
-        }), (err, res, body) => {
-            if (!err && body) {
-                if (res.statusCode === 401) {
-                    callback(new Error('401 Unauthorized'));
+        })).then((response) => {
+                if (response.data) {
+                    if (response.status === 401) {
+                        callback(new Error('401 Unauthorized'));
+                    } else {
+                        let body = iconv.decode(response.data, this.encoding);
+                        this._parseResponse(body, callback);
+                    }
                 } else {
-                    body = iconv.decode(body, this.encoding);
-                    this._parseResponse(body, callback);
+                    callback(new Error('Empty response'));
                 }
-            } else {
-                callback(err);
-            }
-        });
+            })
+            .catch((error) => {
+                callback(error);
+            });
     }
 
     /**
@@ -218,17 +221,17 @@ class Rega {
     _getTranslations(callback) {
         const url = 'http://' + this.host + '/webui/js/lang/' + this.language + '/translate.lang.extension.js';
         this.translations = {};
-        request({
-            method: 'GET',
-            url,
-            encoding: null
-        }, (err, res, body) => {
-            if (!err && body) {
-                this._parseTranslations(iconv.decode(body, this.encoding));
-            }
+        axios.get(url, {responseType: 'arraybuffer'})
+            .then((response) => {
+                if (response.data) {
+                    this._parseTranslations(iconv.decode(response.data, this.encoding));
+                }
 
-            callback();
-        });
+                callback();
+            })
+            .catch((error) => {
+                console.log(error);
+            });
     }
 
     _parseTranslations(body) {
