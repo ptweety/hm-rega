@@ -62,18 +62,18 @@ rega.getVariables((err, res) => {
 * [Rega](#Rega)
     * [new Rega(options)](#new_Rega_new)
     * _instance_
-        * [.exec(script, [callback])](#Rega+exec)
-        * [.script(file, [callback])](#Rega+script)
-        * [.getChannels(callback)](#Rega+getChannels)
-        * [.getValues(callback)](#Rega+getValues)
-        * [.getPrograms(callback)](#Rega+getPrograms)
-        * [.getVariables(callback)](#Rega+getVariables)
-        * [.getRooms(callback)](#Rega+getRooms)
-        * [.getFunctions(callback)](#Rega+getFunctions)
-        * [.setVariable(id, val, [callback])](#Rega+setVariable)
-        * [.startProgram(id, [callback])](#Rega+startProgram)
-        * [.setProgram(id, active, [callback])](#Rega+setProgram)
-        * [.setName(id, name, [callback])](#Rega+setName)
+        * [.exec(script, [callback])](#Rega+exec) ⇒ <code>void</code>
+        * [.script(file, [callback])](#Rega+script) ⇒ <code>void</code>
+        * [.getChannels(callback)](#Rega+getChannels) ⇒ <code>void</code>
+        * [.getValues(callback)](#Rega+getValues) ⇒ <code>void</code>
+        * [.getPrograms(callback)](#Rega+getPrograms) ⇒ <code>void</code>
+        * [.getVariables(callback)](#Rega+getVariables) ⇒ <code>void</code>
+        * [.getRooms(callback)](#Rega+getRooms) ⇒ <code>void</code>
+        * [.getFunctions(callback)](#Rega+getFunctions) ⇒ <code>void</code>
+        * [.setVariable(id, value, [callback])](#Rega+setVariable) ⇒ <code>void</code>
+        * [.startProgram(id, [callback])](#Rega+startProgram) ⇒ <code>void</code>
+        * [.setProgram(id, active, [callback])](#Rega+setProgram) ⇒ <code>void</code>
+        * [.setName(id, name, [callback])](#Rega+setName) ⇒ <code>void</code>
     * _inner_
         * [~scriptCallback](#Rega..scriptCallback) : <code>function</code>
 
@@ -83,7 +83,7 @@ rega.getVariables((err, res) => {
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
-| options | <code>object</code> |  |  |
+| options | <code>object</code> |  | object |
 | options.host | <code>string</code> |  | hostname or IP address of the Homematic CCU |
 | [options.language] | <code>string</code> | <code>&quot;de&quot;</code> | language used for translation of placeholders in variables/rooms/functions |
 | [options.disableTranslation] | <code>boolean</code> | <code>false</code> | disable translation of placeholders |
@@ -96,7 +96,7 @@ rega.getVariables((err, res) => {
 
 <a name="Rega+exec"></a>
 
-### rega.exec(script, [callback])
+### rega.exec(script, [callback]) ⇒ <code>void</code>
 Execute a rega script
 
 **Kind**: instance method of [<code>Rega</code>](#Rega)  
@@ -104,11 +104,11 @@ Execute a rega script
 | Param | Type | Description |
 | --- | --- | --- |
 | script | <code>string</code> | string containing a rega script |
-| [callback] | [<code>scriptCallback</code>](#Rega..scriptCallback) |  |
+| [callback] | [<code>scriptCallback</code>](#Rega..scriptCallback) | callback |
 
 <a name="Rega+script"></a>
 
-### rega.script(file, [callback])
+### rega.script(file, [callback]) ⇒ <code>void</code>
 Execute a rega script from a file
 
 **Kind**: instance method of [<code>Rega</code>](#Rega)  
@@ -116,124 +116,124 @@ Execute a rega script from a file
 | Param | Type | Description |
 | --- | --- | --- |
 | file | <code>string</code> | path to script file |
-| [callback] | [<code>scriptCallback</code>](#Rega..scriptCallback) |  |
+| [callback] | [<code>scriptCallback</code>](#Rega..scriptCallback) | callback |
 
 <a name="Rega+getChannels"></a>
 
-### rega.getChannels(callback)
+### rega.getChannels(callback) ⇒ <code>void</code>
 Get all devices and channels
 
 **Kind**: instance method of [<code>Rega</code>](#Rega)  
 
-| Param | Type |
-| --- | --- |
-| callback | <code>Rega~channelCallback</code> | 
+| Param | Type | Description |
+| --- | --- | --- |
+| callback | <code>Rega~channelCallback</code> | callback |
 
 <a name="Rega+getValues"></a>
 
-### rega.getValues(callback)
+### rega.getValues(callback) ⇒ <code>void</code>
 Get all devices and channels values
 
 **Kind**: instance method of [<code>Rega</code>](#Rega)  
 
-| Param | Type |
-| --- | --- |
-| callback | <code>Rega~valuesCallback</code> | 
+| Param | Type | Description |
+| --- | --- | --- |
+| callback | <code>Rega~valuesCallback</code> | callback |
 
 <a name="Rega+getPrograms"></a>
 
-### rega.getPrograms(callback)
+### rega.getPrograms(callback) ⇒ <code>void</code>
 Get all programs
 
 **Kind**: instance method of [<code>Rega</code>](#Rega)  
 
-| Param | Type |
-| --- | --- |
-| callback | <code>Rega~programsCallback</code> | 
+| Param | Type | Description |
+| --- | --- | --- |
+| callback | <code>Rega~programsCallback</code> | callback |
 
 <a name="Rega+getVariables"></a>
 
-### rega.getVariables(callback)
+### rega.getVariables(callback) ⇒ <code>void</code>
 Get all variables
 
 **Kind**: instance method of [<code>Rega</code>](#Rega)  
 
-| Param | Type |
-| --- | --- |
-| callback | <code>Rega~variablesCallback</code> | 
+| Param | Type | Description |
+| --- | --- | --- |
+| callback | <code>Rega~variablesCallback</code> | callback |
 
 <a name="Rega+getRooms"></a>
 
-### rega.getRooms(callback)
+### rega.getRooms(callback) ⇒ <code>void</code>
 Get all rooms
 
 **Kind**: instance method of [<code>Rega</code>](#Rega)  
 
-| Param | Type |
-| --- | --- |
-| callback | <code>Rega~roomsCallback</code> | 
+| Param | Type | Description |
+| --- | --- | --- |
+| callback | <code>Rega~roomsCallback</code> | callback |
 
 <a name="Rega+getFunctions"></a>
 
-### rega.getFunctions(callback)
+### rega.getFunctions(callback) ⇒ <code>void</code>
 Get all functions
 
 **Kind**: instance method of [<code>Rega</code>](#Rega)  
 
-| Param | Type |
-| --- | --- |
-| callback | <code>Rega~functionsCallback</code> | 
+| Param | Type | Description |
+| --- | --- | --- |
+| callback | <code>Rega~functionsCallback</code> | callback |
 
 <a name="Rega+setVariable"></a>
 
-### rega.setVariable(id, val, [callback])
+### rega.setVariable(id, value, [callback]) ⇒ <code>void</code>
 Set a variables value
 
 **Kind**: instance method of [<code>Rega</code>](#Rega)  
 
-| Param | Type |
-| --- | --- |
-| id | <code>number</code> | 
-| val | <code>number</code> \| <code>boolean</code> \| <code>string</code> | 
-| [callback] | <code>function</code> | 
+| Param | Type | Description |
+| --- | --- | --- |
+| id | <code>number</code> | - |
+| value | <code>number</code> \| <code>boolean</code> \| <code>string</code> | - |
+| [callback] | <code>function</code> | callback |
 
 <a name="Rega+startProgram"></a>
 
-### rega.startProgram(id, [callback])
+### rega.startProgram(id, [callback]) ⇒ <code>void</code>
 Execute a program
 
 **Kind**: instance method of [<code>Rega</code>](#Rega)  
 
-| Param | Type |
-| --- | --- |
-| id | <code>number</code> | 
-| [callback] | <code>function</code> | 
+| Param | Type | Description |
+| --- | --- | --- |
+| id | <code>number</code> | - |
+| [callback] | <code>function</code> | callback |
 
 <a name="Rega+setProgram"></a>
 
-### rega.setProgram(id, active, [callback])
+### rega.setProgram(id, active, [callback]) ⇒ <code>void</code>
 Activate/Deactivate a program
 
 **Kind**: instance method of [<code>Rega</code>](#Rega)  
 
-| Param | Type |
-| --- | --- |
-| id | <code>number</code> | 
-| active | <code>boolean</code> | 
-| [callback] | <code>function</code> | 
+| Param | Type | Description |
+| --- | --- | --- |
+| id | <code>number</code> | - |
+| active | <code>boolean</code> | - |
+| [callback] | <code>function</code> | callback |
 
 <a name="Rega+setName"></a>
 
-### rega.setName(id, name, [callback])
+### rega.setName(id, name, [callback]) ⇒ <code>void</code>
 Rename an object
 
 **Kind**: instance method of [<code>Rega</code>](#Rega)  
 
-| Param | Type |
-| --- | --- |
-| id | <code>number</code> | 
-| name | <code>string</code> | 
-| [callback] | <code>function</code> | 
+| Param | Type | Description |
+| --- | --- | --- |
+| id | <code>number</code> | - |
+| name | <code>string</code> | - |
+| [callback] | <code>function</code> | callback |
 
 <a name="Rega..scriptCallback"></a>
 
@@ -242,7 +242,7 @@ Rename an object
 
 | Param | Type | Description |
 | --- | --- | --- |
-| err | <code>Error</code> |  |
+| error | <code>Error</code> |  |
 | output | <code>string</code> | the scripts output |
 | variables | <code>Object.&lt;string, string&gt;</code> | contains all variables that are set in the script (as strings) |
 
