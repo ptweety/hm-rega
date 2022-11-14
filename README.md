@@ -1,9 +1,7 @@
-# homematic-rega
+# hm-rega
 
-[![NPM version](https://badge.fury.io/js/homematic-rega.svg)](http://badge.fury.io/js/homematic-rega)
-[![dependencies Status](https://david-dm.org/hobbyquaker/homematic-rega/status.svg)](https://david-dm.org/hobbyquaker/homematic-rega)
-[![Build Status](https://travis-ci.org/hobbyquaker/homematic-rega.svg?branch=master)](https://travis-ci.org/hobbyquaker/homematic-rega)
-[![XO code style](https://img.shields.io/badge/code_style-XO-5ed9c7.svg)](https://github.com/sindresorhus/xo)
+This is a fork of [homematic-rega](https://github.com/hobbyquaker/homematic-rega) by Sebastian Raff.
+
 [![License][mit-badge]][mit-url]
 
 > Node.js Homematic CCU ReGaHSS Remote Script Interface
@@ -251,13 +249,9 @@ Rename an object
 
 ## Related projects
 
-* [node-red-contrib-ccu](https://github.com/hobbyquaker/node-red-contrib-ccu) - Node-RED nodes for the Homematic CCU.
-* [homematic-manager](https://github.com/hobbyquaker/homematic-manager) - Cross-platform App to manage Homematic devices 
-and links.
-* [hm2mqtt.js](https://github.com/hobbyquaker/hm2mqtt.js) - Interface between Homematic and MQTT.
-* [binrpc](https://github.com/hobbyquaker/binrpc) - Node.js client/server for the Homematic BINRPC protocol.
-* [homematic-xmlrpc](https://github.com/hobbyquaker/homematic-xmlrpc) - Node.js client/server for the Homematic XMLRPC 
-protocol.
+* [node-red-contrib-ccu](https://github.com/ptweety/node-red-contrib-ccu) - Node-RED nodes for the Homematic CCU.
+* [hm-binrpc](https://github.com/ptweety/hm-binrpc) - Node.js client/server for the Homematic BINRPC protocol.
+* [hm-xmlrpc](https://github.com/ptweety/hm-xmlrpc) - Node.js client/server for the Homematic XMLRPC protocol.
 
 
 ## License
