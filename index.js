@@ -2,14 +2,13 @@ const fs = require('fs');
 const path = require('path');
 const https = require('https');
 
-const tempDir = require('temp-dir');
 const axios = require('axios');
 const iconv = require('iconv-lite');
 const parseXml = require('xml2js').parseString;
 
 class Rega {
     /**
-     * @param {object} options
+     * @param {object} options - object
      * @param {string} options.host - hostname or IP address of the Homematic CCU
      * @param {string} [options.language=de] - language used for translation of placeholders in variables/rooms/functions
      * @param {boolean} [options.disableTranslation=false] - disable translation of placeholders
@@ -26,7 +25,7 @@ class Rega {
         this.host = options.host;
         this.tls = options.tls;
         this.tlsOptions = { rejectUnauthorized: !(options.inSecure || false) };
-        this.port = options.port || (this.tls ? 48181 : 8181);
+        this.port = options.port || (this.tls ? 48_181 : 8181);
         this.auth = options.auth;
         this.user = options.user;
         this.pass = options.pass;
@@ -35,12 +34,12 @@ class Rega {
         this.requestOptions = {
             method: 'POST',
             url: this.url,
-            responseType: 'arraybuffer'
+            responseType: 'arraybuffer',
         };
         if (this.auth) {
             this.requestOptions.auth = {
                 username: this.user,
-                password: this.pass
+                password: this.pass,
             };
         }
 
@@ -51,26 +50,26 @@ class Rega {
 
     /**
      * @callback Rega~scriptCallback
-     * @param {?Error} err
+     * @param {?Error} error
      * @param {string} output - the scripts output
      * @param {Object.<string, string>} variables - contains all variables that are set in the script (as strings)
      */
 
-    _parseResponse(res, callback) {
+    _parseResponse(response, callback) {
         const ERROR_XML_MISSING = new Error('xml in rega response missing');
-        if (res) {
-            const outputEnd = res.lastIndexOf('<xml>');
+        if (response) {
+            const outputEnd = response.lastIndexOf('<xml>');
             if (outputEnd === -1) {
                 callback(ERROR_XML_MISSING);
             } else {
-                const output = res.slice(0, outputEnd);
-                const xml = res.slice(outputEnd);
+                const output = response.slice(0, outputEnd);
+                const xml = response.slice(outputEnd);
                 if (xml) {
-                    parseXml(xml, {explicitArray: false}, (err, res) => {
-                        if (err) {
-                            callback(err, output);
-                        } else if (res) {
-                            callback(null, output, res.xml);
+                    parseXml(xml, {explicitArray: false}, (error, result) => {
+                        if (error) {
+                            callback(error, output);
+                        } else if (result) {
+                            callback(null, output, result.xml);
                         } else {
                             callback(ERROR_XML_MISSING);
                         }
@@ -88,7 +87,8 @@ class Rega {
      * Execute a rega script
      * @method Rega#exec
      * @param {string} script - string containing a rega script
-     * @param {Rega~scriptCallback} [callback]
+     * @param {Rega~scriptCallback} [callback] - callback
+     * @returns {void}
      */
     exec(script, callback) {
         if (typeof callback !== 'function') {
@@ -123,33 +123,34 @@ class Rega {
      * Execute a rega script from a file
      * @method Rega#script
      * @param {string} file - path to script file
-     * @param {Rega~scriptCallback} [callback]
+     * @param {Rega~scriptCallback} [callback] - callback
+     * @returns {void}
      */
     script(file, callback) {
-        // TODO cache files
-        fs.readFile(file, (err, res) => {
-            if (err) {
+        // TODO: cache files
+        fs.readFile(file, (error, result) => {
+            if (error) {
                 if (typeof callback === 'function') {
-                    callback(err);
+                    callback(error);
                 }
             } else {
-                this.exec(res.toString(), callback);
+                this.exec(result.toString(), callback);
             }
         });
     }
 
     _jsonScript(file, callback) {
-        this.script(file, (err, res) => {
-            if (err) {
-                callback(err);
+        this.script(file, (error, result) => {
+            if (error) {
+                callback(error);
             } else {
-                // Todo: remove ugly workaround for https://github.com/rdmtc/RedMatic/issues/381
-                res = res.replace(/, "val": nan,/g, ', "val": null,');
+                // TODO: remove ugly workaround for https://github.com/rdmtc/RedMatic/issues/381
+                result = result.replace(/, "val": nan,/g, ', "val": null,');
                 try {
-                    callback(null, JSON.parse(res));
+                    callback(null, JSON.parse(result));
                 } catch {
-                    const debugFile = path.join(tempDir, path.basename(file) + '.failed.json');
-                    fs.writeFile(debugFile, res, () => {});
+                    const debugFile = path.join('.temp', path.basename(file) + '.failed.json');
+                    fs.writeFile(debugFile, result, () => {});
                     callback(new Error('JSON.parse failed. Saved debug data to ' + debugFile));
                 }
             }
@@ -159,18 +160,19 @@ class Rega {
     /**
      * Get all devices and channels
      * @method Rega#getChannels
-     * @param {Rega~channelCallback} callback
+     * @param {Rega~channelCallback} callback - callback
+     * @returns {void}
      */
     getChannels(callback) {
-        this._jsonScript(path.join(__dirname, 'scripts', 'channels.rega'), (err, res) => {
-            if (err) {
-                callback(err, res);
+        this._jsonScript(path.join(__dirname, 'scripts', 'channels.rega'), (error, result) => {
+            if (error) {
+                callback(error, result);
             } else {
-                res.forEach((channel, index) => {
+                for (const [index, channel] of result.entries()) {
                     channel.name = unescape(channel.name);
-                    res[index] = channel;
-                });
-                callback(null, res);
+                    result[index] = channel;
+                }
+                callback(null, result);
             }
         });
     }
@@ -178,22 +180,23 @@ class Rega {
     /**
      * Get all devices and channels values
      * @method Rega#getValues
-     * @param {Rega~valuesCallback} callback
+     * @param {Rega~valuesCallback} callback - callback
+     * @returns {void}
      */
     getValues(callback) {
-        this._jsonScript(path.join(__dirname, 'scripts', 'values.rega'), (err, res) => {
-            if (err) {
-                callback(err, res);
+        this._jsonScript(path.join(__dirname, 'scripts', 'values.rega'), (error, result) => {
+            if (error) {
+                callback(error, result);
             } else {
-                res.forEach((ch, index) => {
-                    ch.name = unescape(ch.name);
-                    if (typeof ch.value === 'string') {
-                        ch.value = unescape(ch.value);
+                for (const [index, value] of result.entries()) {
+                    value.name = unescape(value.name);
+                    if (typeof value.value === 'string') {
+                        value.value = unescape(value.value);
                     }
 
-                    res[index] = ch;
-                });
-                callback(null, res);
+                    result[index] = value;
+                }
+                callback(null, result);
             }
         });
     }
@@ -201,19 +204,20 @@ class Rega {
     /**
      * Get all programs
      * @method Rega#getPrograms
-     * @param {Rega~programsCallback} callback
+     * @param {Rega~programsCallback} callback - callback
+     * @returns {void}
      */
     getPrograms(callback) {
-        this._jsonScript(path.join(__dirname, 'scripts', 'programs.rega'), (err, res) => {
-            if (err) {
-                callback(err, res);
+        this._jsonScript(path.join(__dirname, 'scripts', 'programs.rega'), (error, result) => {
+            if (error) {
+                callback(error, result);
             } else {
-                res.forEach((prg, index) => {
+                for (const [index, prg] of result.entries()) {
                     prg.name = unescape(prg.name);
                     prg.info = unescape(prg.info);
-                    res[index] = prg;
-                });
-                callback(null, res);
+                    result[index] = prg;
+                }
+                callback(null, result);
             }
         });
     }
@@ -236,12 +240,12 @@ class Rega {
 
     _parseTranslations(body) {
         const lines = body.split('\n');
-        lines.forEach(line => {
+        for (const line of lines) {
             const match = line.match(/\s*"((func|room|sysVar)[^"]+)"\s*:\s*"([^"]+)"/);
             if (match) {
-                this.translations[match[1]] = unescape(match[3]); // TODO replace deprecated unescape
+                this.translations[match[1]] = unescape(match[3]); // TODO: replace deprecated unescape
             }
-        });
+        }
     }
 
     _translate(item) {
@@ -259,25 +263,25 @@ class Rega {
         return item;
     }
 
-    _translateNames(res) {
+    _translateNames(result) {
         if (!this.disableTranslation) {
-            Object.keys(res).forEach(id => {
-                const object = res[id];
+            for (const id of Object.keys(result)) {
+                const object = result[id];
                 object.name = this._translate(unescape(object.name));
                 if (object.info) {
                     object.info = this._translate(unescape(object.info));
                 }
-            });
+            }
         }
 
-        return res;
+        return result;
     }
 
     _translateEnum(values) {
         if (!this.disableTranslation) {
-            values.forEach((value, i) => {
-                values[i] = this._translate(value);
-            });
+            for (const [index, value] of values.entries()) {
+                values[index] = this._translate(value);
+            }
         }
 
         return values;
@@ -285,11 +289,11 @@ class Rega {
 
     _translateJsonScript(file, callback) {
         if (this.translations || this.disableTranslation) {
-            this._jsonScript(file, (err, res) => {
-                if (err) {
-                    callback(err);
+            this._jsonScript(file, (error, response) => {
+                if (error) {
+                    callback(error);
                 } else {
-                    callback(null, this.disableTranslation ? res : this._translateNames(res));
+                    callback(null, this.disableTranslation ? response : this._translateNames(response));
                 }
             });
         } else {
@@ -302,27 +306,24 @@ class Rega {
     /**
      * Get all variables
      * @method Rega#getVariables
-     * @param {Rega~variablesCallback} callback
+     * @param {Rega~variablesCallback} callback - callback
+     * @returns {void}
      */
     getVariables(callback) {
-        this._translateJsonScript(path.join(__dirname, 'scripts', 'variables.rega'), (err, res) => {
-            if (err) {
-                callback(err);
+        this._translateJsonScript(path.join(__dirname, 'scripts', 'variables.rega'), (error, result) => {
+            if (error) {
+                callback(error);
             } else {
-                res.forEach((sysvar, index) => {
+                for (const [index, sysvar] of result.entries()) {
                     if (sysvar.type === 'string') {
                         sysvar.val = unescape(sysvar.val);
                     }
 
-                    if (sysvar.enum === '') {
-                        sysvar.enum = [];
-                    } else {
-                        sysvar.enum = this._translateEnum(unescape(sysvar.enum).split(';'));
-                    }
+                    sysvar.enum = sysvar.enum === '' ? [] : this._translateEnum(unescape(sysvar.enum).split(';'));
 
-                    res[index] = sysvar;
-                });
-                callback(null, res);
+                    result[index] = sysvar;
+                }
+                callback(null, result);
             }
         });
     }
@@ -330,7 +331,8 @@ class Rega {
     /**
      * Get all rooms
      * @method Rega#getRooms
-     * @param {Rega~roomsCallback} callback
+     * @param {Rega~roomsCallback} callback - callback
+     * @returns {void}
      */
     getRooms(callback) {
         this._translateJsonScript(path.join(__dirname, 'scripts', 'rooms.rega'), callback);
@@ -339,7 +341,8 @@ class Rega {
     /**
      * Get all functions
      * @method Rega#getFunctions
-     * @param {Rega~functionsCallback} callback
+     * @param {Rega~functionsCallback} callback - callback
+     * @returns {void}
      */
     getFunctions(callback) {
         this._translateJsonScript(path.join(__dirname, 'scripts', 'functions.rega'), callback);
@@ -348,9 +351,10 @@ class Rega {
     /**
      * Set a variables value
      * @method Rega#setVariable
-     * @param {number} id
-     * @param {number|boolean|string} val
-     * @param {function} [callback]
+     * @param {number} id -
+     * @param {number|boolean|string} value -
+     * @param {function} [callback] - callback
+     * @returns {void}
      */
     setVariable(id, value, callback) {
         const script = 'dom.GetObject(' + id + ').State(' + JSON.stringify(value) + ');';
@@ -360,8 +364,9 @@ class Rega {
     /**
      * Execute a program
      * @method Rega#startProgram
-     * @param {number} id
-     * @param {function} [callback]
+     * @param {number} id -
+     * @param {function} [callback] - callback
+     * @returns {void}
      */
     startProgram(id, callback) {
         const script = 'dom.GetObject(' + id + ').ProgramExecute();';
@@ -371,9 +376,10 @@ class Rega {
     /**
      * Activate/Deactivate a program
      * @method Rega#setProgram
-     * @param {number} id
-     * @param {boolean} active
-     * @param {function} [callback]
+     * @param {number} id -
+     * @param {boolean} active -
+     * @param {function} [callback] - callback
+     * @returns {void}
      */
     setProgram(id, active, callback) {
         const script = 'dom.GetObject(' + id + ').Active(' + Boolean(active) + ');';
@@ -383,9 +389,10 @@ class Rega {
     /**
      * Rename an object
      * @method Rega#setName
-     * @param {number} id
-     * @param {string} name
-     * @param {function} [callback]
+     * @param {number} id -
+     * @param {string} name -
+     * @param {function} [callback] - callback
+     * @returns {void}
      */
     setName(id, name, callback) {
         const script = 'dom.GetObject(' + id + ').Name("' + name + '");';

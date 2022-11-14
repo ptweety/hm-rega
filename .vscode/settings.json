@@ -1,0 +1,8 @@
+{
+    "prettier.enable": false,
+    "eslint.enable": true,
+	"xo.enable": false,
+	"[javascript]": {
+		"editor.defaultFormatter": "dbaeumer.vscode-eslint"
+	}
+}

@@ -28,12 +28,12 @@
   "dependencies": {
     "axios": "^1.1.3",
     "iconv-lite": "^0.6.3",
-    "temp-dir": "^3.0.0",
     "xml2js": "^0.4.23"
   },
   "devDependencies": {
-    "jsdoc-to-markdown": "latest",
-    "xo": "latest"
+    "eslint": "^8.27.0",
+    "eslint-plugin-unicorn": "^44.0.2",
+    "jsdoc-to-markdown": "latest"
   },
   "engines": {
     "node": ">=14.0.0"
@@ -45,16 +45,32 @@
     "url": "git+https://github.com/ptweety/hm-rega.git"
   },
   "scripts": {
-    "test": "xo",
-    "lintfix": "xo --fix",
+    "test": "eslint index.js",
     "docs": "cat readme/README.header.md > README.md; jsdoc2md index.js >> README.md; cat readme/README.footer.md >> README.md"
   },
-  "xo": {
-    "space": 4,
-    "ignore": [
-      "test.js"
+  "eslintConfig": {
+    "env": {
+      "node": true
+    },
+    "extends": [
+      "eslint:recommended",
+      "plugin:unicorn/recommended"
     ],
     "rules": {
+      "no-warning-comments": "warn",
+      "no-unused-vars": [
+        "warn",
+        {
+          "args": "all",
+          "argsIgnorePattern": "^_",
+          "vars": "all",
+          "varsIgnorePattern": "^_"
+        }
+      ],
+      "valid-jsdoc": "warn",
+      "unicorn/no-null": 0,
+      "unicorn/prefer-module": 0,
+      "unicorn/prefer-node-protocol": 0,
       "unicorn/prevent-abbreviations": "warn"
     }
   }
